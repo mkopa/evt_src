@@ -1,12 +1,12 @@
-const LIMIT_ASSIGNED = 'LIMIT_ASSIGNED';
-const CARD_WITHDRAWN = 'CARD_WITHDRAWN';
-const CARD_REPAID = 'CARD_REPAID';
+const {LIMIT_ASSIGNED, CARD_WITHDRAWN, CARD_REPAID} = require("./eventTypes");
+
 
 module.exports = now => {
     const card = id => {
         let limit;
         let used = 0;
         let events = [];
+        let {limitAssigned, cardWithdrawn, cardRepaid} = require("./eventsCreator")(now, id);
 
         // invariant
         function limitAlreadyAssigned() {
@@ -43,8 +43,7 @@ module.exports = now => {
                 if(limitAlreadyAssigned()) {
                     throw new Error('Cannot assign limit for the second time');
                 }
-                const event = {type: LIMIT_ASSIGNED, amount, card_id: id, date: now().toJSON()};
-                applyWithRecord(event);
+                applyWithRecord(limitAssigned(amount));
             },
             availableLimit,
             withdraw(amount) {
@@ -54,12 +53,10 @@ module.exports = now => {
                 if (notEnoughMoney(amount)) {
                     throw new Error('Not enough money');
                 }
-                const event = {type: CARD_WITHDRAWN, amount, card_id: id, date: now().toJSON()};
-                applyWithRecord(event);
+                applyWithRecord(cardWithdrawn(amount));
             },
             repay(amount) {
-                const event = {type: CARD_REPAID, amount, card_id: id, date: now().toJSON()};
-                applyWithRecord(event);
+                applyWithRecord(cardRepaid(amount));
             },
             pendingEvents() {
                 return events;
