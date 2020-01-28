@@ -1,11 +1,11 @@
 const {LIMIT_ASSIGNED, CARD_WITHDRAWN, CARD_REPAID} = require("./eventTypes");
 
-
+// favor delegation over inheritance
 module.exports = now => {
     const card = id => {
         let limit;
         let used = 0;
-        let events = [];
+        let events = []; // generic
         let {limitAssigned, cardWithdrawn, cardRepaid} = require("./eventsCreator")(now, id);
 
         // invariant
@@ -33,6 +33,7 @@ module.exports = now => {
             }
         }
 
+        // generic
         function applyWithRecord(event) {
             events.push(event);
             apply(event);
@@ -58,12 +59,17 @@ module.exports = now => {
             repay(amount) {
                 applyWithRecord(cardRepaid(amount));
             },
+            // generic
             pendingEvents() {
                 return events;
             },
             apply,
             uuid() {
                 return id;
+            },
+            // generic
+            flushEvents() {
+                events = [];
             }
         };
     };
