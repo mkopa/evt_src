@@ -46,12 +46,14 @@ module.exports = now => {
                 if (notEnoughMoney(amount)) {
                     throw new Error('Not enough money');
                 }
-                events.push({type: 'CARD_WITHDRAWN', amount, card_id: id, date: now().toJSON()});
-                used += amount;
+                const event = {type: 'CARD_WITHDRAWN', amount, card_id: id, date: now().toJSON()};
+                events.push(event);
+                apply(event);
             },
             repay(amount) {
-                events.push({type: 'CARD_REPAID', amount, card_id: id, date: now().toJSON()});
-                used -= amount;
+                const event = {type: 'CARD_REPAID', amount, card_id: id, date: now().toJSON()};
+                events.push(event);
+                apply(event);
             },
             pendingEvents() {
                 return events;
