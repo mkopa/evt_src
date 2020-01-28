@@ -17,13 +17,26 @@ module.exports = now => {
             return limit - used;
         }
 
+        function apply(event) {
+            if (event.type === 'LIMIT_ASSIGNED') {
+                limit = event.amount;
+            }
+            if (event.type === 'CARD_WITHDRAWN') {
+                used += event.amount;
+            }
+            if (event.type === 'CARD_REPAID') {
+                used -= event.amount;
+            }
+        }
+
         return {
             assignLimit(amount) {
                 if(limitAlreadyAssigned()) {
                     throw new Error('Cannot assign limit for the second time');
                 }
-                events.push({type: 'LIMIT_ASSIGNED', amount, card_id: id, date: now().toJSON()});
-                limit = amount;
+                const event = {type: 'LIMIT_ASSIGNED', amount, card_id: id, date: now().toJSON()};
+                events.push(event);
+                apply(event);
             },
             availableLimit,
             withdraw(amount) {
@@ -43,17 +56,7 @@ module.exports = now => {
             pendingEvents() {
                 return events;
             },
-            apply(event) {
-                if (event.type === 'LIMIT_ASSIGNED') {
-                    limit = event.amount;
-                }
-                if (event.type === 'CARD_WITHDRAWN') {
-                    used += event.amount;
-                }
-                if (event.type === 'CARD_REPAID') {
-                    used -= event.amount;
-                }
-            },
+            apply,
             uuid() {
                 return id;
             }
