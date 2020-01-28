@@ -7,6 +7,7 @@ module.exports = now => {
         let used = 0;
         let events = []; // generic
         let {limitAssigned, cardWithdrawn, cardRepaid} = require("./eventsCreator")(now, id);
+        const {applyWithRecord, ...tracker} = require("./eventTracker")(apply);
 
         // invariant
         function limitAlreadyAssigned() {
@@ -33,13 +34,9 @@ module.exports = now => {
             }
         }
 
-        // generic
-        function applyWithRecord(event) {
-            events.push(event);
-            apply(event);
-        }
 
         return {
+            ...tracker,
             assignLimit(amount) {
                 if(limitAlreadyAssigned()) {
                     throw new Error('Cannot assign limit for the second time');
@@ -59,17 +56,9 @@ module.exports = now => {
             repay(amount) {
                 applyWithRecord(cardRepaid(amount));
             },
-            // generic
-            pendingEvents() {
-                return events;
-            },
             apply,
             uuid() {
                 return id;
-            },
-            // generic
-            flushEvents() {
-                events = [];
             }
         };
     };
