@@ -1,5 +1,13 @@
 module.exports = function mongoRepository(recreateFrom, es) {
     return {
+        async loadEvents({skip, limit}) {
+            return new Promise(function (resolve, reject) {
+                es.getEvents(skip, limit, function (err, events) {
+                    if (err) reject(err);
+                    resolve(events.map(it => it.payload));
+                });
+            });
+        },
         async save(card) {
             return new Promise(function (resolve, reject) {
                 es.getEventStream(card.uuid(), function (err, stream) {
