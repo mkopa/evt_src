@@ -1,4 +1,5 @@
 const {LIMIT_ASSIGNED, CARD_WITHDRAWN, CARD_REPAID} = require("./eventTypes");
+const ClientError = require("./clientError");
 
 // favor delegation over inheritance
 module.exports = now => {
@@ -39,17 +40,17 @@ module.exports = now => {
             ...tracker,
             assignLimit(amount) {
                 if(limitAlreadyAssigned()) {
-                    throw new Error('Cannot assign limit for the second time');
+                    throw new ClientError('Cannot assign limit for the second time');
                 }
                 applyWithRecord(limitAssigned(amount));
             },
             availableLimit,
             withdraw(amount) {
                 if(!limitAlreadyAssigned()) {
-                    throw new Error('No limit assigned');
+                    throw new ClientError('No limit assigned');
                 }
                 if (notEnoughMoney(amount)) {
-                    throw new Error('Not enough money');
+                    throw new ClientError('Not enough money');
                 }
                 applyWithRecord(cardWithdrawn(amount));
             },

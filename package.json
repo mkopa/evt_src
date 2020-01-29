@@ -4,12 +4,15 @@
   },
   "devDependencies": {
     "faucet": "0.0.1",
+    "supertest": "4.0.2",
     "tap-nyan": "1.1.0",
     "tap-spec": "5.0.0",
-    "tape": "4.9.0"
+    "tape": "4.9.0",
+    "uuid": "3.4.0"
   },
   "dependencies": {
     "eventstore": "1.15.2",
+    "express": "4.17.1",
     "mongodb": "3.5.2"
   }
 }
